@@ -1,0 +1,67 @@
+{
+    "variables": {
+        "hostname": "ubuntu",
+        "domain": "local",
+        "ssh_user": "packer",
+        "ssh_pass": "p@ck3r"
+    },
+    "builders": [{
+        "type": "qemu",
+        "vm_name": "ubuntu-18.04-qemu-template",
+        "iso_url": "http://localhost/ubuntu-18.04.2-server-amd64.iso",
+        "iso_target_path": "/home/localhost/ubuntu-18.04.2-server-amd64.iso",
+        "iso_checksum": "34416ff83179728d54583bf3f18d42d2",
+        "iso_checksum_type": "md5",
+	"output_directory": "output_ubuntu_packertest",
+        "memory": "1024",
+        "cpus": "1",
+        "disk_size": "10000",
+        "format": "qcow2",
+	"accelerator": "kvm",
+        "headless": "false",
+        "http_directory": "/var/www/html/",
+        "ssh_username": "{{user `ssh_user`}}",
+        "ssh_password": "{{user `ssh_pass`}}",
+	"ssh_pty" : "true",
+        "ssh_wait_timeout": "20m",
+	"net_device": "virtio-net",
+        "disk_interface": "virtio",
+        "shutdown_command": "echo 'packer' | sudo -S shutdown -P now",
+        "boot_wait": "10s",
+        "boot_command": [
+            "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+            "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+            "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+            "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+            "/install/vmlinuz<wait>",
+            " auto<wait>",
+            " console-setup/ask_detect=false<wait>",
+            " console-setup/layoutcode=us<wait>",
+            " console-setup/modelcode=pc105<wait>",
+            " debconf/frontend=noninteractive<wait>",
+            " debian-installer=en_US<wait>",
+            " fb=false<wait>",
+            " initrd=/install/initrd.gz<wait>",
+            " kbd-chooser/method=us<wait>",
+            " keyboard-configuration/layout=USA<wait>",
+            " keyboard-configuration/variant=USA<wait>",
+            " locale=en_US<wait>",
+            " netcfg/get_domain={{user `domain`}}<wait>",
+            " netcfg/get_hostname={{user `hostname`}}<wait>",
+            " grub-installer/bootdev=/dev/vda<wait>",
+            " noapic<wait>",
+            " preseed/url=http://192.168.1.7/preseed.cfg",
+            " -- <wait>",
+            "<enter><wait>"
+        ]
+    }],
+
+    "provisioners": [{
+        "type": "shell",
+        "inline": [
+            "sleep 30",
+            "sudo apt update",
+            "sudo apt -y install bash-completion wget vim php php-fpm php-mysql"
+        ]
+    }]
+}
